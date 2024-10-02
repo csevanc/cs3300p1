@@ -1,0 +1,171 @@
+<html>
+
+</html>
+
+</html>
+
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .gridlines line {
+      stroke: #bbb;
+    }
+
+    .gridlines .domain {
+      stroke: none;
+    }
+  </style>
+</head>
+
+<body>
+  <p>Annual Average Anomaly</p>
+  <svg id="bargraph" height="500" width="1500">
+
+  </svg>
+
+  <script>
+    d3.csv('annual_average_anomaly.csv')
+      .then((data) => {
+        const svg = d3.select('svg#bargraph');
+        const width = svg.attr('width');
+        const height = svg.attr('height');
+        const margins = { top: 10, right: 10, bottom: 50, left: 50 };
+        const chartWidth = width - margins.left - margins.right;
+        const chartHeight = height - margins.top - margins.bottom;
+
+        let chartArea = svg.append('g')
+          .attr('transform', `translate(${margins.left},${margins.top})`);
+
+        console.log(data);
+        data.forEach(d => {
+          d['No Smoothing'] = Number(d['No Smoothing']);
+        });
+
+        const parseTime = d3.timeParse("%Y");
+
+        // Turn year into actual dates for making a time scale
+        data.forEach(d => {
+          d.Year = parseTime(d.Year);
+        });
+
+        const yearExtent = d3.extent(data, d => d['Year']);
+        const changeExtent = d3.extent(data, d => d['No Smoothing']);
+
+        console.log(changeExtent);
+        console.log(yearExtent);
+
+        const xScale = d3.scaleTime()
+          .domain(yearExtent)
+          .range([0, chartWidth]);
+
+        const yScale = d3.scaleLinear()
+          // .domain([0, d3.max(data, function (d) { return +d['No Smoothing']; })])
+          .domain(changeExtent)
+          .range([chartHeight, 0]);
+
+        let bottomAxis = d3.axisBottom(xScale).ticks(d3.timeYear.every(1));
+
+        svg.append('g')
+          .attr('class', 'y axis')
+          .attr('transform', `translate(${margins.left},${chartHeight + margins.top + 10})`)
+          .call(bottomAxis);
+
+        let bottomGridlines = d3.axisBottom(xScale)
+          .tickSize(-chartHeight - 10)
+          .tickFormat('')
+          .ticks(46);
+
+        svg.append('g')
+          .attr('class', 'gridlines')
+          .attr('transform', `translate(${margins.left},${chartHeight + margins.top + 10})`)
+          .call(bottomGridlines);
+
+        let leftAxis = d3.axisLeft(yScale);
+        svg.append('g')
+          .attr('class', 'y axis')
+          .attr('transform', `translate(${margins.left},${margins.top})`)
+          .call(leftAxis);
+
+        let leftGridlines = d3.axisLeft(yScale)
+          .tickSize(-chartWidth - 10)
+          .tickFormat('');
+
+        svg.append('g')
+          .attr('class', 'gridlines')
+          .attr('transform', `translate(${margins.left - 10},${margins.top})`)
+          .call(leftGridlines);
+
+        svg.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-width", 2)
+          .attr('transform', `translate(${margins.left},${margins.top})`)
+          .attr("d", d3.line()
+            .x(function (d) { return xScale(d['Year']) })
+            .y(function (d) { return yScale(d['No Smoothing']) })
+          )
+
+        chartArea.selectAll("circle").data(data)
+          .join("circle")
+          .attr("cx", d => xScale(d['Year']))
+          .attr("cy", d => yScale(d['No Smoothing']))
+          .attr("fill", "purple")
+          .attr("r", 3)
+
+        // svg.append("g")
+        //   .attr("class", "text")
+        //   .attr("transform", `translate(10, 250), rotate(-90)`)
+        //   .append("text")
+        //   .text("Percent Difference of CO2 Emissions from 1966")
+        //   .text("Fossil cO2 Emissions (tons)")
+        //   .attr("text-anchor", "middle").attr("dominant-baseline", "middle").style("fill", "black").style("font-family", "Monaco").style("font-size", 20)
+
+        // svg.append("linearGradient")
+        //   .attr("id", "line-gradient")
+        //   .attr("gradientUnits", "userSpaceOnUse")
+        //   .attr("x1", 0)
+        //   .attr("y1", yScale(changeExtent[0]))
+        //   .attr("x2", 0)
+        //   .attr("y2", yScale(changeExtent[1]))
+        //   .selectAll("stop")
+        //   .data([
+        //     { offset: "0%", color: "blue" },
+        //     { offset: "100%", color: "red" }
+        //   ])
+        //   .enter().append("stop")
+        //   .attr("offset", function (d) { return d.offset; })
+        //   .attr("stop-color", function (d) { return d.color; });
+
+
+
+        // let bottomAxis = d3.axisBottom(xScale);
+
+
+        // // .ticks(25).tickFormat(function (d, i) {
+        // //   if (i % 2) return d;
+        // //   else return null;
+        // // });
+
+
+        // console.log(data)
+
+
+        // svg.append("g")
+        //   .attr("fill", "steelblue")
+        //   .selectAll()
+        //   .data(data)
+        //   .join("rect")
+        //   .attr("x", d => xScale(d['Year']))
+        //   .attr("y", d => yScale(d['No Smoothing']))
+        //   .attr("height", d => yScale(0) - yScale(d['No Smoothing']))
+        //   .attr("width", xScale.bandwidth());
+
+      }, (error) => { console.log('error', error); });
+  </script>
+
+  </p>
+
+</body>
+
+</html>
