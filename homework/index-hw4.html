@@ -1,0 +1,125 @@
+<html>
+    <head>
+        <title>INFO 3300 - HW 4 - Justin Wong (jsw345)</title>
+        <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+  
+        <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+        <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+        <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+        <link rel="stylesheet" href="../css/hljs-base16.css">
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+        
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <style>
+        .gridlines line {
+            stroke: #bbb;
+        }
+        
+        .gridlines .domain {
+            stroke: none;
+        }
+        </style>
+        
+    </head>
+    <body>
+        <h1>INFO3300 - HW 4 - Justin Wong (jsw345)</h1>
+        <h4> Problem 1</h4>
+        <p id="p1">
+            (a) 
+            <br />
+            <u>Marks</u>
+            <br />
+            - Circles representing a job sector for a given year
+            <br />
+            <br />
+            <u>Visual Channels</u> 
+            <br />
+            - Aligned vertical position: job sector falling or rising
+            <br />
+            - Aligned horizontal position: year of job sector
+            <br />
+            - Color hue: employment in job sector
+            <br />
+            <br />
+            (b)
+            <br />
+            <u>Marks</u>
+            <br />
+            - Dog silhouettes representing dog breeds
+            <br />
+            <br />
+            <u>Visual Channels</u>
+            <br />
+            - Aligned vertical position: popularity of dog breed
+            <br />
+            - Aligned horizontal position: creator's calculated data score for a dog breed
+            <br />
+            - Area: size of dog breed
+            <br />
+            - Color hue: the AKC dog breed group a breed belongs to
+        </p>
+        <h4> Problem 2</h4>
+        <p id="p2">
+            <script>
+                d3.json('chip_dataset.json').then( (data) => {
+                    p2 = d3.select("p#p2");
+                    const height = 500;
+                    const width = 500;
+                    const margins = {top: 10, right: 10, bottom: 50, left: 50};
+                    const chartHeight = height - margins.top - margins.bottom;
+                    const chartWidth = width - margins.left - margins.right;
+                    svg = p2.append("svg")
+                    svg.attr("height", height)
+                       .attr("width", width)
+                    let chartArea = svg.append('g')
+                                    .attr("transform", `translate(${margins.left}, ${margins.top})`)
+                    
+                    let releaseExtent = d3.extent(data, d => d['Release Day'])
+                    let transistorExtent = d3.extent(data, d => d['Transistors(million)'])
+                    
+                    let xScale = d3.scaleLinear()
+                                   .domain(releaseExtent)
+                                   .range([0, chartWidth])
+                    let yScale = d3.scaleLog()
+                                   .domain(transistorExtent)
+                                   .range([chartHeight, 0])
+
+                    let leftAxis = d3.axisLeft(yScale)
+                    svg.append("g")
+                       .attr("transform", `translate(${margins.left-10}, ${margins.top})`)
+                       .call(leftAxis)
+
+                    let leftGridlines = d3.axisLeft(yScale).tickFormat("").tickSize(-chartWidth-10)
+                    svg.append("g")
+                       .attr("class", "gridlines") // space in class, get two different classes
+                       .attr("transform", `translate(${margins.left-10}, ${margins.top})`)
+                       .call(leftGridlines)
+
+                    let bottomAxis = d3.axisBottom(xScale)
+                    svg.append("g")
+                       .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+10})`)
+                       .call(bottomAxis)
+
+                    let bottomGridlines = d3.axisBottom(xScale).tickFormat("").tickSize(-chartHeight-10)
+                    svg.append("g")
+                       .attr("class", "gridlines") // space in class, get two different classes
+                       .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+10})`)
+                       .call(bottomGridlines)
+                    
+                    data.forEach( (d) => {
+                        chartArea.append('circle')
+                        .attr('r', 3)
+                        .attr('cx', xScale(d['Release Day']))
+                        .attr('cy', yScale(d['Transistors(million)']))
+                        .attr("opacity", 0.3)
+                        .style("fill", "darkblue");
+                    })
+
+                    chartArea.raise();
+                })
+
+            </script>
+        </p>
+    </body>
+</html>

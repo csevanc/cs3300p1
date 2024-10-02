@@ -1,0 +1,62 @@
+<html></html>
+    <head>
+        <title>INFO 3300 - HW 3 - Justin Wong (jsw345)</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+    </head>
+    <body>
+        <h3>INFO3300 - HW 3 - Jusstin Wong (jsw345)</h3>
+        <h4> Problem 1</h4>
+        <p id="p1">
+            <svg height=400 width=400 style="border:1px solid black; margin-bottom: 50px;">
+            </svg>
+            <script>
+                let svg = d3.select("svg");
+
+                svg.append("circle")
+                   .attr("cx", 200)
+                   .attr("cy", 200)
+                   .attr("r", 10)
+                   .style("fill", "lightgrey")
+                   .style("stroke", "none")
+
+                svg.append("text")
+                   .text("Justin")
+                   .attr("text-anchor", "middle")
+                   .attr("x", 200)
+                   .attr("y", 200)
+                   .style("fill", "darkblue")
+                   .style("font-family", "Courier")
+                   .style("font-size", 30)
+
+                svg.append("rect")
+                   .attr("x", 50)
+                   .attr("y", 50)
+                   .attr("height", 50)
+                   .attr("width", 100)
+                   .style("fill", "orange")
+                   .style("stroke", "blue")
+                   .style("stroke-width", 3)
+
+                svg.append("rect")
+                   .attr("x", 250)
+                   .attr("y", 250)
+                   .attr("height", 80)
+                   .attr("width", 60)
+                   .style("fill", "red")
+                   .style("stroke", "green")
+                   .style("stroke-width", 5)
+
+                svg.append("path")
+                   .attr("fill", "yellow")
+                   .attr("stroke", "purple")
+                   .attr("stroke-width", 2)
+                   .attr("d", "M 20 275 H 50 V 200 L 80 320 L 40 370 H 20 Z")
+            </script>
+
+        </p>
+        <h4> Problem 2</h4>
+        <p id="p2">
+            
+        </p>
+    </body>
+</html>

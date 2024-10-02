@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <link href="https://fonts.googleapis.com/css?family=Lato:400,700|Raleway:400,700" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="../css/normalize.css">
+        <link rel="stylesheet" type="text/css" href="../css/skeleton.css">
+        <link rel="stylesheet" type="text/css" href="../css/custom-style.css">
+        <script src="https://d3js.org/d3.v7.min.js"></script>  
+        
+        <style>
+            .gridlines line {
+                stroke: #bbb;
+            }
+            
+            .gridlines .domain {
+                stroke: none;
+            }
+        </style>
+        
+        <title>INFO 3300 - Project 1 - Justin Wong (jsw345)</title>
+    </head>
+    <body>
+        <h3>INFO3300 - Project 1- Justin Wong (jsw345)</h3>
+        <p id="p1">
+            <script>
+                d3.csv('Global CO2 Emissions Per Year.csv').then( (data) => { 
+                    const height = 600;
+                    const width = 1400;
+                    const margins = {top: 10, right: 10, bottom: 60, left: 125};
+                    const chartHeight = height - margins.top - margins.bottom;
+                    const chartWidth = width - margins.left - margins.right;
+                    p1 = d3.select("p#p1");
+                    svg = p1.append("svg")
+                    svg.attr("height", height)
+                       .attr("width", width)
+                    let chartArea = svg.append('g')
+                                       .attr("transform", `translate(${margins.left}, ${margins.top})`)
+
+                    let sum = 0;
+                    data.reverse();
+                    data.forEach( (d) => {
+                        // will find total percent increases from 1976
+                        let currPercent = d['CO2 Emissions Change'];
+                        currPercent = currPercent.substring(0, currPercent.length - 1);
+                        sum += Number(currPercent);
+                        d['Absolute CO2 Change'] = sum;
+                        d['Fossil CO2 Emissions (tons) Number'] = Number(d['Fossil CO2 Emissions (tons)'].replace(/,/g,''));
+                    })
+
+                    let yearExtent = d3.extent(data, d => d['Year'])
+                    let changeExtent = d3.extent(data, d => d['Absolute CO2 Change'])
+                    console.log(data)
+                    let CO2Extent = d3.extent(data, d => d['Fossil CO2 Emissions (tons) Number'])
+                    console.log(CO2Extent)
+                    let xScale = d3.scaleLinear()
+                                   .domain(yearExtent)
+                                   .range([0, chartWidth])
+                    let yScale = d3.scaleLinear()
+                                   .domain(changeExtent)
+                                   .range([chartHeight, 0])
+
+                    let leftAxis = d3.axisLeft(yScale).tickFormat(x => x + "%")
+                    // let leftAxis = d3.axisLeft(yScale)
+                    // let leftAxis = d3.axisLeft(yScale).tickFormat(x => String(x).substring(0, 2) + "M")
+                    svg.append("g")
+                       .attr("transform", `translate(${margins.left-10}, ${margins.top})`)
+                       .call(leftAxis)
+
+                    let leftGridlines = d3.axisLeft(yScale).tickFormat("").tickSize(-chartWidth-10)
+                    svg.append("g")
+                       .attr("class", "gridlines") // space in class, get two different classes
+                       .attr("transform", `translate(${margins.left-10}, ${margins.top})`)
+                       .call(leftGridlines)
+                    
+                    let bottomAxis = d3.axisBottom(xScale).tickFormat(x => Number(x)) // .ticks(data.length)
+                    svg.append("g")
+                       .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+10})`)
+                       .call(bottomAxis)
+
+                    // let bottomGridlines = d3.axisBottom(xScale).tickFormat("").tickSize(-chartHeight-10)
+                    // svg.append("g")
+                    //    .attr("class", "gridlines") // space in class, get two different classes
+                    //    .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+10})`)
+                    //    .call(bottomGridlines)
+
+                    // chartArea.selectAll("text").data(data)
+                    //          .join("text")
+                    //          .attr("x", d => xScale(d['Year']))
+                    //          .attr("y", d => yScale(d['Fossil CO2 Emissions (tons) Number']) - 5)
+                    //          .attr("text-anchor", "middle")
+                    //          .attr("font-size", "10px")
+                    //          .text(d => Number(d['Year'])) 
+                
+                    // chartArea.selectAll("line").data(data)
+                    //          .join("line")
+                    //          .attr("x1", d => xScale(d['Year']) )
+                    //          .attr("y1", height-margins.bottom)
+                    //          .attr("x2", d => xScale(d['Year']) )
+                    //         //  .attr("y2", d => yScale(d['Absolute CO2 Change']))
+                    //          .attr("y2", d => yScale(d['Fossil CO2 Emissions (tons) Number']))
+                    //          .style("stroke", "#5555F0")
+                    //          .style("stroke-width", 10);
+
+                    let lineGen = d3.line()
+                                    .x(d => xScale( d['Year'] ))
+                                    .y(d => yScale(d['Absolute CO2 Change']))
+                                    .curve(d3.curveMonotoneX)
+                    chartArea.append("path")
+                             .datum(data)
+                             .attr("class", "line")
+                             .attr("fill", "none")
+                             .attr("stroke", "steelblue")
+                             .attr("stroke-width", 3)
+                             .attr("d", d => lineGen(d))
+
+                    chartArea.selectAll("circle").data(data)
+                             .join("circle")
+                             .attr("cx", d => xScale(d['Year']))
+                             .attr("cy", d => yScale(d['Absolute CO2 Change']))
+                             .attr("fill", "purple")
+                             .attr("r", 3)
+
+                    chartArea.raise()
+
+                    svg.append("g")
+                       .attr("class", "text")
+                       .attr("transform", `translate(40, 275), rotate(-90)`)
+                    //    .attr("transform", `translate(15, 275), rotate(-90)`)
+                       .append("text") 
+                    //    .text("Percent Difference of CO2 Emissions from 1966")
+                       .text("Fossil CO2 Emissions (tons)")
+                       .attr("text-anchor", "middle")
+                       .attr("dominant-baseline", "middle")
+                       .style("fill", "black")
+                       .style("font-family", "Monaco")
+                       .style("font-size", 20)
+                    
+                    svg.append("g")
+                       .attr("class", "text") // space in class, get two different classes
+                       .attr("transform", `translate(750, 595)`)
+                       .append("text") 
+                       .text("Year")
+                       .attr("text-anchor", "middle")
+                       .attr("dominant-baseline", "middle")
+                       .style("fill", "black")
+                       .style("font-family", "Monaco")
+                       .style("font-size", 20)
+
+                    // svg.append("text")
+                    //    .text("Percent Difference of CO2 Emissions from 1966")
+                    //    .attr("text-anchor", "middle")
+                    //    .attr("dominant-baseline", "middle")
+                    //    .attr("transform", "rotate(-1)")
+                    //    .attr("x", 500)
+                    //    .attr("y", 200)
+                    //    .style("fill", "black")
+                    //    .style("font-family", "Monaco")
+                    //    .style("font-size", 20)               
+
+                })
+            </script>
+        </p>
+    </body>
+</html>
