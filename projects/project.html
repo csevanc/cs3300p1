@@ -99,16 +99,32 @@
                     //          .attr("y2", d => yScale(d['Fossil CO2 Emissions (tons) Number']))
                     //          .style("stroke", "#5555F0")
                     //          .style("stroke-width", 10);
+                    chartArea.append("linearGradient")
+                             .attr("id", "line-gradient")
+                             .attr("gradientUnits", "userSpaceOnUse")
+                             .attr("x1", 0)
+                             .attr("y1", yScale(changeExtent[0]))
+                             .attr("x2", 0)
+                             .attr("y2", yScale(changeExtent[1]))
+                             .selectAll("stop")
+                             .data([
+                             {offset: "0%", color: "#58eb34"},
+                             {offset: "100%", color: "#525451"}
+                             ])
+                             .enter().append("stop")
+                                    .attr("offset", function(d) { return d.offset; })
+                                    .attr("stop-color", function(d) { return d.color; });
 
                     let lineGen = d3.line()
                                     .x(d => xScale( d['Year'] ))
                                     .y(d => yScale(d['Absolute CO2 Change']))
                                     .curve(d3.curveMonotoneX)
+                    
                     chartArea.append("path")
                              .datum(data)
                              .attr("class", "line")
                              .attr("fill", "none")
-                             .attr("stroke", "steelblue")
+                             .attr("stroke", "url(#line-gradient)")
                              .attr("stroke-width", 3)
                              .attr("d", d => lineGen(d))
 
