@@ -65,7 +65,6 @@
           .range([0, chartWidth]);
 
         const yScale = d3.scaleLinear()
-          // .domain([0, d3.max(data, function (d) { return +d['No Smoothing']; })])
           .domain(changeExtent)
           .range([chartHeight, 0]);
 
@@ -100,6 +99,26 @@
           .attr('class', 'gridlines')
           .attr('transform', `translate(${margins.left - 10},${margins.top})`)
           .call(leftGridlines);
+
+        svg.append("g")
+          .attr("transform", `translate(10, 240), rotate(-90)`)
+          .append("text")
+          .text("Tempeartue Anomaly from 1977 (C)")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .style("fill", "black")
+          .style("font-family", "Monaco")
+          .style("font-size", 20)
+
+        svg.append("g")
+          .attr("transform", `translate(760, 490)`)
+          .append("text")
+          .text("Year")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .style("fill", "black")
+          .style("font-family", "Monaco")
+          .style("font-size", 20)
 
         svg.append("path")
           .datum(data)
