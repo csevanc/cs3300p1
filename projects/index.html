@@ -247,13 +247,13 @@
 
                 let bottomAxis = d3.axisBottom(xScale).tickFormat(x => Number(x))
                 svg.append("g")
-                    .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 10})`)
+                    .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 30})`)
                     .call(bottomAxis)
 
                 let bottomGridlines = d3.axisBottom(xScale).tickFormat("").tickSize(-chartHeight - 10)
                 svg.append("g")
                     .attr("class", "gridlines")
-                    .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 10})`)
+                    .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 30})`)
                     .call(bottomGridlines)
 
                 // below code credited in codesource.js
@@ -261,7 +261,7 @@
 
                 // setting up color gradient for line in line graph
                 chartArea.append("linearGradient")
-                    .attr("id", "line-gradient")
+                    .attr("id", "line-gradient-emissions")
                     .attr("gradientUnits", "userSpaceOnUse")
                     .attr("x1", 0)
                     .attr("y1", yScale(CO2Extent[0]))
@@ -289,7 +289,7 @@
                     .datum(data)
                     .attr("class", "line")
                     .attr("fill", "none")
-                    .attr("stroke", "url(#line-gradient)")
+                    .attr("stroke", "url(#line-gradient-emissions)")
                     .attr("stroke-width", 3)
                     .attr("d", d => lineGen(d))
 
@@ -309,7 +309,10 @@
                     .attr("text-anchor", "middle")
                     .attr("font-size", "14px")
                     .style("font-weight", "bold")
-                    .text(d => d['Year'] == 2020 ? "Covid-19 Pandemic" : (d['Year'] == 2009 ? "End of Great Recession" : ""));
+                    .text(d => d['Year'] == 2020 ? "Covid-19 Pandemic" : 
+                            (d['Year'] == 2009 ? "End of Great Recession" : (
+                                d['Year'] == 1982 ? "Early 1980s Recession" : ""
+                         )));
 
                 // add percent change label above data points
                 chartArea.selectAll("text#from1976").data(data)
@@ -545,7 +548,7 @@
                         .style("font-weight", "bold");
 
                     svg.append("text")
-                        .text("Eruption of Mount Pinatubo (1991)")
+                        .text("Eruption of Mount Pinatubo ('91)")
                         .attr("x", 560)
                         .attr("y", 420)
                         .style("text-anchor", "middle")
