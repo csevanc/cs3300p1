@@ -242,24 +242,14 @@
                     
                     let bottomAxis = d3.axisBottom(xScale).tickFormat(x => Number(x)) 
                     svg.append("g")
-                       .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+30})`)
+                       .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+10})`)
                        .call(bottomAxis)
 
                     let bottomGridlines = d3.axisBottom(xScale).tickFormat("").tickSize(-chartHeight-10)
                     svg.append("g")
                        .attr("class", "gridlines") 
-                       .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+30})`)
+                       .attr("transform", `translate(${margins.left}, ${margins.top+chartHeight+10})`)
                        .call(bottomGridlines)
-
-                    // add percent change label above data points
-                    chartArea.selectAll("text#from1976").data(data)
-                             .join("text")
-                             .attr("class", "from1976")
-                             .attr("x", d => xScale(d['Year']))
-                             .attr("y", d => yScale(d['Fossil CO2 Emissions (tons) Number']) - 15)
-                             .attr("text-anchor", "middle")
-                             .attr("font-size", "10px")
-                             .text(d => Math.round(d['Absolute CO2 Change']) + "%") 
 
                     // below code credited in codesource.js
                     // ********************************************************************************************************
@@ -304,6 +294,25 @@
                              .attr("fill", "blue")
                              .attr("r", 3)
 
+                    // add specific info/text about anomalies/events in datapoints (COVID and Great Recession)
+                    chartArea.selectAll("text#events").data(data)
+                             .join("text")
+                             .attr("x", d => xScale(d['Year']))
+                             .attr("y", d => yScale(d['Fossil CO2 Emissions (tons) Number']) + 20)
+                             .attr("text-anchor", "middle")
+                             .attr("font-size", "14px")
+                             .text(d => d['Year'] == 2020 ? "Covid-19 Pandemic" : (d['Year'] == 2009 ? "End of Great Recession" : "")); 
+
+                    // add percent change label above data points
+                    chartArea.selectAll("text#from1976").data(data)
+                             .join("text")
+                             .attr("class", "from1976")
+                             .attr("x", d => xScale(d['Year']))
+                             .attr("y", d => yScale(d['Fossil CO2 Emissions (tons) Number']) - 15)
+                             .attr("text-anchor", "middle")
+                             .attr("font-size", "10px")
+                             .text(d => Math.round(d['Absolute CO2 Change']) + "%") 
+
                     chartArea.raise()
 
                     // y-label
@@ -321,7 +330,7 @@
                     // x-label
                     svg.append("g")
                        .attr("class", "text") 
-                       .attr("transform", `translate(${width/2}, ${height-margins.bottom/2+30})`)
+                       .attr("transform", `translate(${width/2}, ${height-margins.bottom/2+15})`)
                        .append("text") 
                        .text("Year")
                        .attr("text-anchor", "middle")
