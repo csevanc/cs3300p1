@@ -15,6 +15,12 @@
       stroke: none;
     }
   </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
@@ -59,11 +65,10 @@
           .range([0, chartWidth]);
 
         const yScale = d3.scaleLinear()
-          // .domain([0, d3.max(data, function (d) { return +d['No Smoothing']; })])
           .domain(changeExtent)
           .range([chartHeight, 0]);
 
-        let bottomAxis = d3.axisBottom(xScale).ticks(d3.timeYear.every(1));
+        let bottomAxis = d3.axisBottom(xScale).ticks(d3.timeYear.every(5));
 
         svg.append('g')
           .attr('class', 'y axis')
@@ -73,7 +78,7 @@
         let bottomGridlines = d3.axisBottom(xScale)
           .tickSize(-chartHeight - 10)
           .tickFormat('')
-          .ticks(46);
+          .ticks(10);
 
         svg.append('g')
           .attr('class', 'gridlines')
@@ -95,6 +100,26 @@
           .attr('transform', `translate(${margins.left - 10},${margins.top})`)
           .call(leftGridlines);
 
+        svg.append("g")
+          .attr("transform", `translate(10, 240), rotate(-90)`)
+          .append("text")
+          .text("Tempeartue Anomaly from 1977 (C)")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .style("fill", "black")
+          .style("font-family", "Monaco")
+          .style("font-size", 20)
+
+        svg.append("g")
+          .attr("transform", `translate(760, 490)`)
+          .append("text")
+          .text("Year")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .style("fill", "black")
+          .style("font-family", "Monaco")
+          .style("font-size", 20)
+
         svg.append("path")
           .datum(data)
           .attr("fill", "none")
@@ -111,55 +136,94 @@
           .attr("cx", d => xScale(d['Year']))
           .attr("cy", d => yScale(d['No Smoothing']))
           .attr("fill", "purple")
-          .attr("r", 3)
+          .attr("r", 3);
 
-        // svg.append("g")
-        //   .attr("class", "text")
-        //   .attr("transform", `translate(10, 250), rotate(-90)`)
-        //   .append("text")
-        //   .text("Percent Difference of CO2 Emissions from 1966")
-        //   .text("Fossil cO2 Emissions (tons)")
-        //   .attr("text-anchor", "middle").attr("dominant-baseline", "middle").style("fill", "black").style("font-family", "Monaco").style("font-size", 20)
+        svg.append("text")
+          .text("1997–98 El Niño")
+          .attr("x", 710)
+          .attr("y", 225)
+          .style("text-anchor", "middle")
+          .style("font-family", "lato")
+          .style("font-weight", "bold");
 
-        // svg.append("linearGradient")
-        //   .attr("id", "line-gradient")
-        //   .attr("gradientUnits", "userSpaceOnUse")
-        //   .attr("x1", 0)
-        //   .attr("y1", yScale(changeExtent[0]))
-        //   .attr("x2", 0)
-        //   .attr("y2", yScale(changeExtent[1]))
-        //   .selectAll("stop")
-        //   .data([
-        //     { offset: "0%", color: "blue" },
-        //     { offset: "100%", color: "red" }
-        //   ])
-        //   .enter().append("stop")
-        //   .attr("offset", function (d) { return d.offset; })
-        //   .attr("stop-color", function (d) { return d.color; });
+        svg.append("text")
+          .text("Eruption of Mount Pinatubo")
+          .attr("x", 510)
+          .attr("y", 420)
+          .style("text-anchor", "middle")
+          .style("font-family", "lato")
+          .style("font-weight", "bold");
+
+        svg.append("text")
+          .text("The Paris Agreement")
+          .attr("x", xScale(parseTime(2015)) + 80)
+          .attr("y", 65)
+          .style("text-anchor", "middle")
+          .style("font-family", "lato")
+          .style("font-weight", "bold");
+
+        function leastSquares(xSeries, ySeries) {
+
+          function sum(curr, prev) { return curr + prev; };
+
+          const xMean = xSeries.reduce(sum) / xSeries.length;
+          const yMean = ySeries.reduce(sum) / ySeries.length;
+
+          const ssXX = xSeries.map((d) => { return Math.pow(d - xMean, 2); })
+            .reduce(sum);
+
+          const ssYY = ySeries.map((d) => { return Math.pow(d - yMean, 2); })
+            .reduce(sum);
+
+          const ssXY = xSeries.map((d, i) => { return (d - xMean) * (ySeries[i] - yMean); })
+            .reduce(sum);
+
+          const slope = ssXY / ssXX;
+          const intercept = yMean - (xMean * slope);
+          const rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+
+          return [slope, intercept, rSquare];
+        }
+
+        const xLabels = data.map((d) => { return d['Year']; })
+        const xSeries = d3.range(0, xLabels.length);
+        const ySeries = data.map((d) => { return d['No Smoothing']; });
+        const leastSquaresCoeff = leastSquares(xSeries, ySeries);
+
+        const x1 = xLabels[0];
+        const y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
+        const x2 = xLabels[xLabels.length - 1];
+        const y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
+        const trendData = [[x1, y1, x2, y2]];
 
 
+        const trendline = svg.selectAll(".trendline")
+          .data(trendData);
 
-        // let bottomAxis = d3.axisBottom(xScale);
+        trendline.enter()
+          .append("line")
+          .attr('transform', `translate(${margins.left},${margins.top})`)
+          .attr("class", "trendline")
+          .attr("x1", function (d) { return xScale(d[0]); })
+          .attr("y1", function (d) { return yScale(d[1]); })
+          .attr("x2", function (d) { return xScale(d[2]); })
+          .attr("y2", function (d) { return yScale(d[3]); })
+          .attr("stroke", "red")
+          .attr("stroke-width", 1)
+          .attr("stroke-dasharray", 20, 10);
 
+        svg.append("text")
+          .text("r-sq: " + Math.round(leastSquaresCoeff[2] * 100) / 100)
+          .attr("x", function (d) { return xScale(x2) - 60; })
+          .attr("y", function (d) { return yScale(y2) - 10; })
+          .attr("dominant-baseline", "middle")
+          .attr('transform', `translate(-70 460) rotate(-15)`)
+          .attr("class", "text-label")
+          .style("text-anchor", "middle")
+          .style("font-family", "lato")
+          .style("font-weight", "bold");
 
-        // // .ticks(25).tickFormat(function (d, i) {
-        // //   if (i % 2) return d;
-        // //   else return null;
-        // // });
-
-
-        // console.log(data)
-
-
-        // svg.append("g")
-        //   .attr("fill", "steelblue")
-        //   .selectAll()
-        //   .data(data)
-        //   .join("rect")
-        //   .attr("x", d => xScale(d['Year']))
-        //   .attr("y", d => yScale(d['No Smoothing']))
-        //   .attr("height", d => yScale(0) - yScale(d['No Smoothing']))
-        //   .attr("width", xScale.bandwidth());
+        chartArea.raise();
 
       }, (error) => { console.log('error', error); });
   </script>
