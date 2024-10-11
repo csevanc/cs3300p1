@@ -40,6 +40,17 @@
         const margins = { top: 35, right: 10, bottom: 60, left: 90 };
         const chartWidth = width - margins.left - margins.right;
         const chartHeight = height - margins.top - margins.bottom;
+        const gradient = svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "line-gradient")
+        .attr("x1", "0%").attr("y1", "0%")
+        .attr("x2", "0%").attr("y2", "100%");  
+        gradient.append("stop")
+          .attr("offset", "90%")
+          .attr("stop-color", "red");
+        gradient.append("stop")
+          .attr("offset", "10%")
+          .attr("stop-color", "blue");
 
         let chartArea = svg.append('g')
           .attr('transform', `translate(${margins.left},${margins.top})`);
@@ -140,7 +151,7 @@
         svg.append("path")
           .datum(data)
           .attr("fill", "none")
-          .attr("stroke", "steelblue")
+          .attr("stroke", "url(#line-gradient)")
           .attr("stroke-width", 2)
           .attr('transform', `translate(${margins.left},${margins.top})`)
           .attr("d", d3.line()
