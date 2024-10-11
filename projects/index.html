@@ -16,11 +16,11 @@
         }
     </style>
 
-    <title>INFO 3300 - Project 1 - Justin Wong (jsw345)</title>
+    <title>INFO 3300 - Project 1 - Evan Chen (ec723), Nelson Feng (nf243), Justin Wong (jsw345)</title>
 </head>
 
 <body>
-    <h3>INFO3300 - Project 1- Justin Wong (jsw345)</h3>
+    <h2>INFO 3300 - Project 1 - Evan Chen (ec723), Nelson Feng (nf243), Justin Wong (jsw345)</h2>
     <p id="p1">
         <svg id="lineChart" height="600" width="1500"></svg>
         <svg id="colorLegend" height="100" width="600" style="background: #fff; margin-top:30px"></svg>
@@ -250,7 +250,7 @@
                     .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 30})`)
                     .call(bottomAxis)
 
-                let bottomGridlines = d3.axisBottom(xScale).tickFormat("").tickSize(-chartHeight - 10)
+                let bottomGridlines = d3.axisBottom(xScale).tickFormat("").tickSize(-chartHeight - 30)
                 svg.append("g")
                     .attr("class", "gridlines")
                     .attr("transform", `translate(${margins.left}, ${margins.top + chartHeight + 30})`)
@@ -362,7 +362,7 @@
                     .style("font-family", "Monaco")
                     .style("font-size", 25)
 
-                // explanation label at bottom left of graph
+                // footnote at bottom left of graph
                 svg.append("g")
                     .attr("class", "text")
                     .attr("transform", `translate(${margins.left / 2 - 20}, ${height - 7})`)
@@ -405,7 +405,7 @@
                     const svg = d3.select('svg#bargraph');
                     const width = svg.attr('width');
                     const height = svg.attr('height');
-                    const margins = { top: 35, right: 10, bottom: 60, left: 90 };
+                    const margins = { top: 35, right: 10, bottom: 120, left: 90 };
                     const chartWidth = width - margins.left - margins.right;
                     const chartHeight = height - margins.top - margins.bottom;
 
@@ -435,6 +435,7 @@
 
                     // Turn year into actual dates for making a time scale
                     data.forEach(d => {
+                        d['YearNum'] = Number(d.Year);
                         d.Year = parseTime(d.Year);
                     });
 
@@ -497,7 +498,7 @@
 
                     // x-label
                     svg.append("g")
-                        .attr("transform", `translate(760, 490)`)
+                        .attr("transform", `translate(${width/2}, ${chartHeight+margins.bottom-25})`)
                         .append("text")
                         .text("Year")
                         .attr("text-anchor", "middle")
@@ -540,28 +541,44 @@
 
 
                     // annotations describing events over the years
+                    chartArea.selectAll("text#eventsTemp").data(data)
+                             .join("text")
+                             .attr("class", "eventsTemp")
+                             .attr("x", d => xScale(d['Year']))
+                             .attr("y", d => d['YearNum'] == 1991 ? yScale(d['No Smoothing']) - 30 :  yScale(d['No Smoothing']) - 10)
+                             .attr("text-anchor", "middle")
+                             .attr("font-size", "14px")
+                             .style("font-weight", "bold")
+                             .text(d => d['YearNum'] == 1991 ? "Eruption of Mount Pinatubo ('91)" : 
+                                    (d['YearNum'] == 2016 ? "The Paris Agreement" : ""));
+
+                    // need to manually input this text label because of accent on n
                     d3.select("text#nino")
                         .attr("x", 730)
-                        .attr("y", 230)
+                        .attr("y", 200)
+                        .attr("font-size", "14px")
                         .style("text-anchor", "middle")
                         .style("font-family", "Monaco")
                         .style("font-weight", "bold");
 
+                    // footnote at bottom left
                     svg.append("text")
-                        .text("Eruption of Mount Pinatubo ('91)")
-                        .attr("x", 560)
-                        .attr("y", 415)
-                        .style("text-anchor", "middle")
-                        .style("font-family", "Monaco")
-                        .style("font-weight", "bold");
-
-                    svg.append("text")
-                        .text("The Paris Agreement")
-                        .attr("x", xScale(parseTime(2015)) + 120)
-                        .attr("y", 85)
-                        .style("text-anchor", "middle")
-                        .style("font-family", "Monaco")
-                        .style("font-weight", "bold");
+                       .text(`*Temperature anomaly is the difference, positive or negative, of a temperature from \n a 
+                        base or reference value. In our case the reference value is the surface temperature at 1977 and 
+                        the temperature for each year is the average temperature for that year.`)
+                       .attr("x", margins.left/2-20)
+                       .attr("y", chartHeight+margins.bottom+20)
+                       .style("text-anchor", "start")
+                       .style("font-family", "Monaco")
+                       .style("font-size", 14)
+                    
+                    // svg.append("text")
+                    //    .text(`*In our case the base value is the surface temperature at 1977 and 
+                    //     the temperature for each year is the average temperature for that year.`)
+                    //    .attr("x", margins.left/2-20)
+                    //    .attr("y", chartHeight+margins.bottom+25)
+                    //    .style("text-anchor", "start")
+                    //    .style("font-family", "Monaco")
 
 
                     // function to calucate the least squares regression
