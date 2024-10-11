@@ -15,16 +15,9 @@
       stroke: none;
     }
   </style>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
-    rel="stylesheet">
 </head>
 
 <body>
-  <p>Annual Average Anomaly</p>
   <svg id="bargraph" height="500" width="1500">
 
   </svg>
@@ -32,17 +25,21 @@
   <script>
     d3.csv('annual_average_anomaly.csv')
       .then((data) => {
+
+        // set up margins
         const svg = d3.select('svg#bargraph');
         const width = svg.attr('width');
         const height = svg.attr('height');
-        const margins = { top: 10, right: 10, bottom: 50, left: 50 };
+        const margins = { top: 35, right: 10, bottom: 60, left: 90 };
         const chartWidth = width - margins.left - margins.right;
         const chartHeight = height - margins.top - margins.bottom;
+
+        // create gradient
         const gradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "line-gradient")
-        .attr("x1", "0%").attr("y1", "0%")
-        .attr("x2", "0%").attr("y2", "100%");  
+          .append("linearGradient")
+          .attr("id", "line-gradient")
+          .attr("x1", "0%").attr("y1", "0%")
+          .attr("x2", "0%").attr("y2", "100%");
         gradient.append("stop")
           .attr("offset", "90%")
           .attr("stop-color", "red");
@@ -53,6 +50,7 @@
         let chartArea = svg.append('g')
           .attr('transform', `translate(${margins.left},${margins.top})`);
 
+        // parse data into Number type
         console.log(data);
         data.forEach(d => {
           d['No Smoothing'] = Number(d['No Smoothing']);
@@ -68,9 +66,7 @@
         const yearExtent = d3.extent(data, d => d['Year']);
         const changeExtent = d3.extent(data, d => d['No Smoothing']);
 
-        console.log(changeExtent);
-        console.log(yearExtent);
-
+        // create scales
         const xScale = d3.scaleTime()
           .domain(yearExtent)
           .range([0, chartWidth]);
@@ -79,6 +75,8 @@
           .domain(changeExtent)
           .range([chartHeight, 0]);
 
+
+        // create axes and gridlines
         let bottomAxis = d3.axisBottom(xScale).ticks(d3.timeYear.every(5));
 
         svg.append('g')
@@ -112,9 +110,9 @@
           .call(leftGridlines);
 
         svg.append("g")
-          .attr("transform", `translate(10, 240), rotate(-90)`)
+          .attr("transform", `translate(30, 235), rotate(-90)`)
           .append("text")
-          .text("Tempeartue Anomaly from 1977 (C)")
+          .text("Temperature Anomaly from 1977 (C)")
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "middle")
           .style("fill", "black")
@@ -131,6 +129,19 @@
           .style("font-family", "Monaco")
           .style("font-size", 20)
 
+        // title
+        svg.append("g")
+          .attr("class", "text")
+          .attr("transform", `translate(${width / 2}, ${margins.top / 2})`)
+          .append("text")
+          .text("Global Temperature Anomaly (C) from 1977 to 2022")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .style("fill", "black")
+          .style("font-family", "Monaco")
+          .style("font-size", 25)
+
+        // create line
         svg.append("path")
           .datum(data)
           .attr("fill", "none")
@@ -142,6 +153,7 @@
             .y(function (d) { return yScale(d['No Smoothing']) })
           )
 
+        // create points for every datum
         chartArea.selectAll("circle").data(data)
           .join("circle")
           .attr("cx", d => xScale(d['Year']))
@@ -149,30 +161,35 @@
           .attr("fill", "purple")
           .attr("r", 3);
 
+
+        // annotations describing events over the years
         svg.append("text")
           .text("1997–98 El Niño")
-          .attr("x", 710)
-          .attr("y", 225)
+          .attr("x", 730)
+          .attr("y", 235)
           .style("text-anchor", "middle")
-          .style("font-family", "lato")
+          .style("font-family", "Monaco")
           .style("font-weight", "bold");
 
         svg.append("text")
           .text("Eruption of Mount Pinatubo")
-          .attr("x", 510)
+          .attr("x", 560)
           .attr("y", 420)
           .style("text-anchor", "middle")
-          .style("font-family", "lato")
+          .style("font-family", "Monaco")
           .style("font-weight", "bold");
 
         svg.append("text")
           .text("The Paris Agreement")
-          .attr("x", xScale(parseTime(2015)) + 80)
-          .attr("y", 65)
+          .attr("x", xScale(parseTime(2015)) + 120)
+          .attr("y", 85)
           .style("text-anchor", "middle")
-          .style("font-family", "lato")
+          .style("font-family", "Monaco")
           .style("font-weight", "bold");
 
+
+        // function to calucate the least squares regression
+        // credited in codesource.js
         function leastSquares(xSeries, ySeries) {
 
           function sum(curr, prev) { return curr + prev; };
@@ -196,6 +213,7 @@
           return [slope, intercept, rSquare];
         }
 
+        // given set of data, calculate the least squares and output the trendline
         const xLabels = data.map((d) => { return d['Year']; })
         const xSeries = d3.range(0, xLabels.length);
         const ySeries = data.map((d) => { return d['No Smoothing']; });
@@ -223,15 +241,16 @@
           .attr("stroke-width", 1)
           .attr("stroke-dasharray", 20, 10);
 
+        // display the r-squared correlation number
         svg.append("text")
           .text("r-sq: " + Math.round(leastSquaresCoeff[2] * 100) / 100)
           .attr("x", function (d) { return xScale(x2) - 60; })
           .attr("y", function (d) { return yScale(y2) - 10; })
           .attr("dominant-baseline", "middle")
-          .attr('transform', `translate(-70 460) rotate(-15)`)
+          .attr('transform', `translate(-30 455 ) rotate(-15)`)
           .attr("class", "text-label")
           .style("text-anchor", "middle")
-          .style("font-family", "lato")
+          .style("font-family", "Monaco")
           .style("font-weight", "bold");
 
         chartArea.raise();
