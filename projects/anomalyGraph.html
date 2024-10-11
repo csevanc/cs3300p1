@@ -19,6 +19,7 @@
 
 <body>
   <svg id="bargraph" height="500" width="1500">
+    <text id="nino">1997-98 El Ni&#241;o</text>
 
   </svg>
 
@@ -109,6 +110,7 @@
           .attr('transform', `translate(${margins.left - 10},${margins.top})`)
           .call(leftGridlines);
 
+        // y-label
         svg.append("g")
           .attr("transform", `translate(30, 235), rotate(-90)`)
           .append("text")
@@ -119,6 +121,7 @@
           .style("font-family", "Monaco")
           .style("font-size", 20)
 
+        // x-label
         svg.append("g")
           .attr("transform", `translate(760, 490)`)
           .append("text")
@@ -163,10 +166,9 @@
 
 
         // annotations describing events over the years
-        svg.append("text")
-          .text("1997–98 El Niño")
+        d3.select("text#nino")
           .attr("x", 730)
-          .attr("y", 235)
+          .attr("y", 230)
           .style("text-anchor", "middle")
           .style("font-family", "Monaco")
           .style("font-weight", "bold");
@@ -225,7 +227,7 @@
         const y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
         const trendData = [[x1, y1, x2, y2]];
 
-
+        // create trendline
         const trendline = svg.selectAll(".trendline")
           .data(trendData);
 

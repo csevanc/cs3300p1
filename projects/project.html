@@ -26,7 +26,7 @@
 
             <script>
                 // below code credited in codesource.js
-                // ********************************************************************************************************
+                // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
                 function drawLegend(legendSelector, legendColorScale) {
                     // This code should adapt to a variety of different kinds of color scales
                     //  Credit Prof. Rz if you are basing a legend on this structure, and note PERFORMANCE CONSIDERATIONS
@@ -190,7 +190,7 @@
                       .call(barAxis);
                 
                 }
-                // ********************************************************************************************************
+                // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                 // above credited in codesource.js
 
                 d3.csv('Global CO2 Emissions Per Year.csv').then( (data) => { 
@@ -252,7 +252,8 @@
                        .call(bottomGridlines)
 
                     // below code credited in codesource.js
-                    // ********************************************************************************************************
+                    // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+
                     // setting up color gradient for line in line graph
                     chartArea.append("linearGradient")
                              .attr("id", "line-gradient")
@@ -269,7 +270,8 @@
                              .enter().append("stop")
                                     .attr("offset", function(d) { return d.offset; })
                                     .attr("stop-color", function(d) { return d.color; });
-                    // ********************************************************************************************************
+
+                    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                     // above credited in codesource.js                                    
 
                     // draw line in line graph
@@ -301,6 +303,7 @@
                              .attr("y", d => yScale(d['Fossil CO2 Emissions (tons) Number']) + 20)
                              .attr("text-anchor", "middle")
                              .attr("font-size", "14px")
+                             .style("font-weight", "bold")
                              .text(d => d['Year'] == 2020 ? "Covid-19 Pandemic" : (d['Year'] == 2009 ? "End of Great Recession" : "")); 
 
                     // add percent change label above data points

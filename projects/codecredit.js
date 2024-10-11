@@ -1,5 +1,6 @@
 // used code from website on how to make a line chart have a color gradient: https://d3-graph-gallery.com/graph/line_color_gradient_svg.html
-// ********************************************************************************************************
+// VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+
 chartArea.append("linearGradient")
   .attr("id", "line-gradient")
   .attr("gradientUnits", "userSpaceOnUse")
@@ -15,14 +16,16 @@ chartArea.append("linearGradient")
   .enter().append("stop")
   .attr("offset", function (d) { return d.offset; })
   .attr("stop-color", function (d) { return d.color; });
-// ********************************************************************************************************
+
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // Flexible legend-drawing function - Jeff Rzeszotarski, 2024
 //   Released under MIT Free license
 //  Takes in an SVG element selector <legendSelector> and a d3 color scale <legendColorScale>
 //
 // Usage example: drawLegend("#legendID", grossIncomeColorScale)
-// ********************************************************************************************************
+// VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+
 function drawLegend(legendSelector, legendColorScale) {
 
   // This code should adapt to a variety of different kinds of color scales
@@ -169,9 +172,12 @@ function drawLegend(legendSelector, legendColorScale) {
 
 }
 
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 // used code on how to calcuate least squares given a set of data and create a trend line : https://gist.github.com/benvandyke/8459843
 
 // get the x and y values for least squares
+// VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 
 var xSeries = d3.range(1, xLabels.length + 1);
 var ySeries = data.map(function (d) { return parseFloat(d['rate']); });
@@ -235,3 +241,5 @@ function leastSquares(xSeries, ySeries) {
 
   return [slope, intercept, rSquare];
 }
+
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
