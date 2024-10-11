@@ -15,12 +15,6 @@
       stroke: none;
     }
   </style>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
-    rel="stylesheet">
 </head>
 
 <body>
@@ -33,18 +27,19 @@
       .then((data) => {
 
         // set up margins
-
         const svg = d3.select('svg#bargraph');
         const width = svg.attr('width');
         const height = svg.attr('height');
         const margins = { top: 35, right: 10, bottom: 60, left: 90 };
         const chartWidth = width - margins.left - margins.right;
         const chartHeight = height - margins.top - margins.bottom;
+
+        // create gradient
         const gradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "line-gradient")
-        .attr("x1", "0%").attr("y1", "0%")
-        .attr("x2", "0%").attr("y2", "100%");  
+          .append("linearGradient")
+          .attr("id", "line-gradient")
+          .attr("x1", "0%").attr("y1", "0%")
+          .attr("x2", "0%").attr("y2", "100%");
         gradient.append("stop")
           .attr("offset", "90%")
           .attr("stop-color", "red");
@@ -82,7 +77,6 @@
 
 
         // create axes and gridlines
-
         let bottomAxis = d3.axisBottom(xScale).ticks(d3.timeYear.every(5));
 
         svg.append('g')
@@ -220,7 +214,6 @@
         }
 
         // given set of data, calculate the least squares and output the trendline
-
         const xLabels = data.map((d) => { return d['Year']; })
         const xSeries = d3.range(0, xLabels.length);
         const ySeries = data.map((d) => { return d['No Smoothing']; });
